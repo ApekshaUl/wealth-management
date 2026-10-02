@@ -21,7 +21,7 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserCreateRequestDTO request)
     {
         UserResponseDTO response = userService.createUser(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(201).body(response);
     }
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getUserId(@PathVariable Long id)
@@ -36,12 +36,12 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @RequestBody UserCreateRequestDTO request)
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UserCreateRequestDTO request)
     {
         UserResponseDTO response= userService.update(id, request);
         return ResponseEntity.ok(response);
     }
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<UserResponseDTO> deleteUser(@PathVariable Long id)
     {
         userService.deleteUser(id);

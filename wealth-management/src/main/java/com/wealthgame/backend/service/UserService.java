@@ -2,6 +2,7 @@ package com.wealthgame.backend.service;
 
 import com.wealthgame.backend.dto.UserCreateRequestDTO;
 import com.wealthgame.backend.dto.UserResponseDTO;
+import com.wealthgame.backend.exception.UserNotFoundException;
 import com.wealthgame.backend.repository.UserRepository;
 import com.wealthgame.backend.model.User;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class UserService {
         User user = userRepository.findById(id);
         if(user==null)
         {
-            return null;
+            throw new UserNotFoundException("User Not Found "+id);
         }
         return new UserResponseDTO(
                 user.getId(), user.getName(), user.getEmail()
@@ -58,7 +59,7 @@ public class UserService {
         User existingUser = userRepository.findById(id);
         if(existingUser==null)
         {
-            return null;
+            throw new UserNotFoundException("User Not Found "+id);
         }
         User updatedUser = new User(
                 id,
@@ -73,7 +74,7 @@ public class UserService {
         User user = userRepository.findById(id);
         if(user==null)
         {
-            return;
+            throw new UserNotFoundException("User Not Found "+id);
         }
         userRepository.deleteUser(id);
     }
