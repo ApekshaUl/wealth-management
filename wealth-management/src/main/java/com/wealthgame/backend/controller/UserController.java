@@ -3,6 +3,7 @@ package com.wealthgame.backend.controller;
 import com.wealthgame.backend.dto.UserCreateRequestDTO;
 import com.wealthgame.backend.dto.UserResponseDTO;
 import com.wealthgame.backend.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,7 @@ public class UserController {
         this.userService = userService;
     }
     @PostMapping
-    public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserCreateRequestDTO request)
+    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserCreateRequestDTO request)
     {
         UserResponseDTO response = userService.createUser(request);
         return ResponseEntity.ok(response);
