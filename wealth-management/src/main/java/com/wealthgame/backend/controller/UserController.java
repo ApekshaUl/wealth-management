@@ -3,6 +3,9 @@ package com.wealthgame.backend.controller;
 import com.wealthgame.backend.dto.UserCreateRequestDTO;
 import com.wealthgame.backend.dto.UserResponseDTO;
 import com.wealthgame.backend.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +14,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
+@Tag(
+        name = "Users",
+        description="API for managing users"
+)
 public class UserController {
     private final UserService userService;
     public UserController(UserService userService)
@@ -23,6 +30,11 @@ public class UserController {
         UserResponseDTO response = userService.createUser(request);
         return ResponseEntity.status(201).body(response);
     }
+    @Operation(
+            summary = "get users by id",
+            description = "Retrives user with unique IDs"
+
+    )
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getUserId(@PathVariable Long id)
     {
@@ -36,7 +48,10 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UserCreateRequestDTO request)
+    public ResponseEntity<UserResponseDTO> updateUser(@Parameter(
+            description = "Unique ID of the user",
+            example = "1"
+    )@PathVariable Long id, @Valid @RequestBody UserCreateRequestDTO request)
     {
         UserResponseDTO response= userService.update(id, request);
         return ResponseEntity.ok(response);
