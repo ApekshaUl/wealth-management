@@ -46,10 +46,12 @@ public class UserController {
     public ResponseEntity<PageResponseDTO<UserResponseDTO>> getAllUsers(
             @RequestParam(required = false) String name,
             @RequestParam(defaultValue="0") int page,
-            @RequestParam(defaultValue="10") int size
+            @RequestParam(defaultValue="10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
             )
     {
-        PageResponseDTO<UserResponseDTO> response = userService.getAllUsers(name,page,size);
+        PageResponseDTO<UserResponseDTO> response = userService.getAllUsers(name,page,size,sortBy,direction);
         return ResponseEntity.ok(response);
     }
     @PutMapping("/{id}")

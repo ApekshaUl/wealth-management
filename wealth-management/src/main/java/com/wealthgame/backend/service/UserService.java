@@ -9,6 +9,7 @@ import com.wealthgame.backend.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -45,7 +46,8 @@ public class UserService {
         );
 
     }
-    public PageResponseDTO<UserResponseDTO> getAllUsers(String name, int page, int size)
+    public PageResponseDTO<UserResponseDTO> getAllUsers(String name, int page, int size, String sortBy,
+                                                        String direction)
     {
 
         List<User> users = userRepository.findAll().values().stream().toList();
@@ -55,6 +57,33 @@ public class UserService {
                     .filter(user -> user.getName().equalsIgnoreCase(name))
                     .toList();
         }
+        Comparator<User> comparator = switch(sortBy.toLowerCase())
+        {
+            case "name" -> Comparator.comparing(
+                    User::getName, String.CASE_INSENSITIVE_ORDER
+            );
+            case "email" -> Comparator.comparing(
+                    User::getEmail, String.CASE_INSENSITIVE_ORDER
+            );
+            case "id" -> Comparator.comparing(
+                    User::getId
+            );
+            default -> throw new IllegalArgumentException(
+                    "Invalid sort Field " + sortBy
+            );
+        };
+        if("desc".equalsIgnoreCase(direction))
+        {
+            comparator = comparator.reversed();
+        }
+        else if(!"asc".equalsIgnoreCase(direction))
+        {
+            throw new IllegalArgumentException("Invalid sort field "+direction);
+        }
+
+        users = users.stream()
+                .sorted(comparator)
+                .toList();
         int totalElements = users.size();
         int startIndex = page * size;
         if(startIndex >= totalElements)
