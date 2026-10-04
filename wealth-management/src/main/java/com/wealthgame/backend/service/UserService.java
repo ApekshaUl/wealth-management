@@ -1,5 +1,6 @@
 package com.wealthgame.backend.service;
 
+import com.wealthgame.backend.dto.PageResponseDTO;
 import com.wealthgame.backend.dto.UserCreateRequestDTO;
 import com.wealthgame.backend.dto.UserResponseDTO;
 import com.wealthgame.backend.exception.UserNotFoundException;
@@ -44,15 +45,29 @@ public class UserService {
         );
 
     }
-    public List<UserResponseDTO> getAllUsers()
+    public PageResponseDTO<UserResponseDTO> getAllUsers(int page, int size)
     {
-        return userRepository.findAll().values().stream().map(
-                user -> new UserResponseDTO(
-                        user.getId(),
-                        user.getName(),
-                        user.getEmail()
+
+        List<User> users = userRepository.findAll().values().stream().toList();
+        int totalElements = users.size();
+        int startIndex = page * size;
+        if(startIndex >= totalElements)
+        {
+            return new PageResponseDTO<>(
+                    List.of(),
+                    page,
+                    size,
+                    totalElements,
+                    (int) Math.ceil((double) totalElements/size)
+            );
+        }
+        int endIndex = Math.min(startIndex + size,totalElements);
+        List<UserResponseDTO> content = users.subList(startIndex,endIndex).stream().map(user-> new UserResponseDTO(
+                user.getId(),user.getName(),user.getEmail()
                 )
         ).toList();
+        int totalPages = (int) Math.ceil((double)totalElements/size);
+        return new PageResponseDTO<>(content,page,size,totalElements,totalPages);
     }
     public UserResponseDTO update(Long id, UserCreateRequestDTO request)
     {

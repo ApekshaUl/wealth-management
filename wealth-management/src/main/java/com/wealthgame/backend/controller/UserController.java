@@ -1,5 +1,6 @@
 package com.wealthgame.backend.controller;
 
+import com.wealthgame.backend.dto.PageResponseDTO;
 import com.wealthgame.backend.dto.UserCreateRequestDTO;
 import com.wealthgame.backend.dto.UserResponseDTO;
 import com.wealthgame.backend.service.UserService;
@@ -42,9 +43,9 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
     @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> getAllUsers()
+    public ResponseEntity<PageResponseDTO<UserResponseDTO>> getAllUsers(@RequestParam(defaultValue="0") int page, @RequestParam(defaultValue="10") int size)
     {
-        List<UserResponseDTO> response = userService.getAllUsers();
+        PageResponseDTO<UserResponseDTO> response = userService.getAllUsers(page,size);
         return ResponseEntity.ok(response);
     }
     @PutMapping("/{id}")
