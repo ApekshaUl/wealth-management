@@ -45,10 +45,16 @@ public class UserService {
         );
 
     }
-    public PageResponseDTO<UserResponseDTO> getAllUsers(int page, int size)
+    public PageResponseDTO<UserResponseDTO> getAllUsers(String name, int page, int size)
     {
 
         List<User> users = userRepository.findAll().values().stream().toList();
+        if(name!=null && !name.isBlank())
+        {
+            users = users.stream()
+                    .filter(user -> user.getName().equalsIgnoreCase(name))
+                    .toList();
+        }
         int totalElements = users.size();
         int startIndex = page * size;
         if(startIndex >= totalElements)
