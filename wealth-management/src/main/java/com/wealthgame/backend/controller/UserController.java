@@ -3,6 +3,7 @@ package com.wealthgame.backend.controller;
 import com.wealthgame.backend.dto.PageResponseDTO;
 import com.wealthgame.backend.dto.UserCreateRequestDTO;
 import com.wealthgame.backend.dto.UserResponseDTO;
+import com.wealthgame.backend.service.IdempotencyService;
 import com.wealthgame.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,14 +22,29 @@ import java.util.List;
 )
 public class UserController {
     private final UserService userService;
-    public UserController(UserService userService)
+    private final IdempotencyService idempotencyService;
+    public UserController(UserService userService, IdempotencyService idempotencyService)
     {
         this.userService = userService;
+        this.idempotencyService=idempotencyService;
     }
     @PostMapping
-    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserCreateRequestDTO request)
+    public ResponseEntity<UserResponseDTO> createUser(
+            @RequestHeader(value="Idempotency-Key",required = false) String idempotencyKey,
+            @Valid @RequestBody UserCreateRequestDTO request)
     {
+        if (idempotencyKey == null || idempotencyKey.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        if(idempotencyService.isProcessed(idempotencyKey))
+        {
+            UserResponseDTO previousResponse = (UserResponseDTO) idempotencyService.getResponse(idempotencyKey);
+            return ResponseEntity.status(200).body(previousResponse);
+        }
+
         UserResponseDTO response = userService.createUser(request);
+        idempotencyService.marksAsProcessed(idempotencyKey,response);
+
         return ResponseEntity.status(201).body(response);
     }
     @Operation(
